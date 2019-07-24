@@ -8,6 +8,7 @@ set -e
 
 # Change to the expected directory
 cd "$(dirname "$0")/../.."
+source "$(dirname "$0")/../../.env";
 
 # Check whether Docker is installed and running
 . "$(dirname "$0")/launch-containers.sh"
@@ -16,6 +17,9 @@ cd "$(dirname "$0")/../.."
 # Note: we don't bother installing the test site right now, because that's
 # done on every time `npm run test-e2e` is run.
 . "$(dirname "$0")/install-wordpress.sh"
+
+# Set up environment variables to complete setup state.
+. "$(dirname "$0")/setup-environment.sh"
 
 CURRENT_URL=$(docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run -T --rm cli option get siteurl)
 
