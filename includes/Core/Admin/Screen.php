@@ -123,7 +123,7 @@ final class Screen {
 				if ( null === $menu_slug ) {
 					add_menu_page(
 						$this->args['title'],
-						__( 'Site KAT', 'google-site-kit' ),
+						__( 'SiteTOOLZ', 'google-site-kit' ),
 						$this->args['capability'],
 						$this->slug,
 						function() use ( $context ) {
