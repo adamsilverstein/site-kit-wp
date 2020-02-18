@@ -7,15 +7,6 @@ jobs:
   build-pr-release:
     runs-on: ubuntu-latest
     steps:
-<<<<<<< HEAD
-    - name: Repository Dispatch
-      uses: peter-evans/repository-dispatch@v1
-      with:
-        token: ${{ secrets.REPO_ACCESS_TOKEN }}
-        event-type: buildpr
-        repository: adamsilverstein/site-kit-wp-builds
-        client-payload: '{"ref": "${{ github.ref }}"}'
-=======
     - uses: actions/checkout@v2
       with:
         repository: adamsilverstein/site-kit-wp
@@ -73,4 +64,3 @@ jobs:
       env:
         GITHUB_PERSONAL_ACCESS_TOKEN: ${{ secrets.GITHUB_PERSONAL_ACCESS_TOKEN }}
         WIKI_COMMIT_MESSAGE: "Add build files for PR ${{ github.ref }}"
->>>>>>> develop
