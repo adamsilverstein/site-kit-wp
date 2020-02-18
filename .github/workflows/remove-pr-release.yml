@@ -7,6 +7,7 @@ jobs:
   trigger-pr-release:
     runs-on: ubuntu-latest
     steps:
+    - uses: actions/checkout@v2
     - name: Repository Dispatch
     run: |
       bash .github/remove-from-wiki.sh ${{ github.ref }}
