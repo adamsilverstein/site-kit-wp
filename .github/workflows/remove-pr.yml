@@ -12,12 +12,13 @@ jobs:
           repository: ${{ github.repository }}.wiki
           token: ${{ secrets.GITHUB_PERSONAL_ACCESS_TOKEN }}
       - name: Prune PR files
+        PR_PATH: "refs/pull/${ github.event.pull_request.number }/merge/"
         run: |
-          rm -rf ${GITHUB_REF}
+          rm -rf ${{ PR_PATH }}
           git add .
           git status
           git diff --staged --quiet && echo 'No changes to commit; exiting!' && exit 0
-          git commit -m "Prune ${GITHUB_REF}"
+          git commit -m "Prune ${ PR_PATH }"
           git push origin master
         env:
           GIT_AUTHOR_EMAIL: ${{ github.actor }}@users.noreply.github.com
