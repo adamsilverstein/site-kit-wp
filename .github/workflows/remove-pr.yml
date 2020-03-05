@@ -3,7 +3,6 @@ name: remove-pr
 on:
   pull_request:
     types: [closed]
-
 jobs:
   remove-pr:
     runs-on: ubuntu-latest
