@@ -34,6 +34,42 @@ const projectPath = ( relativePath ) => {
 	return path.resolve( fs.realpathSync( process.cwd() ), relativePath );
 };
 
+const noAMDParserRule = { parser: { amd: false } };
+
+const siteKitExternals = {
+	'googlesitekit-api': [ 'googlesitekit', 'api' ],
+	'googlesitekit-data': [ 'googlesitekit', 'data' ],
+};
+
+const externals = { ...siteKitExternals };
+
+const rules = [
+	noAMDParserRule,
+	{
+		test: /\.js$/,
+		exclude: /node_modules/,
+		use: [
+			{
+				loader: 'babel-loader',
+				query: {
+					presets: [ [ '@babel/env', {
+						useBuiltIns: 'entry',
+						corejs: 2,
+					} ], '@babel/preset-react' ],
+				},
+			},
+			{
+				loader: 'eslint-loader',
+				options: {
+					quiet: true,
+					formatter: require( 'eslint' ).CLIEngine.getFormatter( 'stylish' ),
+				},
+			},
+		],
+		...noAMDParserRule,
+	},
+];
+
 const resolve = {
 	alias: {
 		'@wordpress/api-fetch__non-shim': require.resolve( '@wordpress/api-fetch' ),
@@ -54,6 +90,7 @@ const webpackConfig = ( mode ) => {
 				// New Modules (Post-JSR).
 				'googlesitekit-api': './assets/js/googlesitekit-api.js',
 				'googlesitekit-data': './assets/js/googlesitekit-data.js',
+				'googlesitekit-datastore-site': './assets/js/googlesitekit-datastore-site.js',
 				// Old Modules
 				'googlesitekit-activation': './assets/js/googlesitekit-activation.js',
 				'googlesitekit-settings': './assets/js/googlesitekit-settings.js',
@@ -67,6 +104,7 @@ const webpackConfig = ( mode ) => {
 				// Needed to test if a browser extension blocks this by naming convention.
 				ads: './assets/js/ads.js',
 			},
+			externals,
 			output: {
 				filename: '[name].js',
 				path: __dirname + '/dist/assets/js',
@@ -77,31 +115,7 @@ const webpackConfig = ( mode ) => {
 				maxEntrypointSize: 175000,
 			},
 			module: {
-				rules: [
-					{
-						test: /\.js$/,
-						exclude: /node_modules/,
-						use: [
-							{
-								loader: 'babel-loader',
-								query: {
-									presets: [ [ '@babel/env', {
-										useBuiltIns: 'entry',
-										corejs: 2,
-									} ], '@babel/preset-react' ],
-								},
-							},
-							{
-								loader: 'eslint-loader',
-								options: {
-									quiet: true,
-									formatter: require( 'eslint' ).CLIEngine.getFormatter( 'stylish' ),
-								},
-							},
-						],
-						parser: { amd: false },
-					},
-				],
+				rules,
 			},
 			plugins: [
 				new ProvidePlugin( {
@@ -119,7 +133,10 @@ const webpackConfig = ( mode ) => {
 						sourceMap: false,
 						cache: true,
 						terserOptions: {
-							keep_fnames: /__|_x|_n|_nx|sprintf/,
+							// We preserve function names that start with capital letters as
+							// they're _likely_ component names, and these are useful to have
+							// in tracebacks and error messages.
+							keep_fnames: /__|_x|_n|_nx|sprintf|^[A-Z].+$/,
 							output: {
 								comments: /translators:/i,
 							},
@@ -191,30 +208,7 @@ const testBundle = () => {
 			publicPath: '',
 		},
 		module: {
-			rules: [
-				{
-					test: /\.js$/,
-					exclude: /node_modules/,
-					use: [
-						{
-							loader: 'babel-loader',
-							query: {
-								presets: [ [ '@babel/env', {
-									useBuiltIns: 'entry',
-									corejs: 2,
-								} ], '@babel/preset-react' ],
-							},
-						},
-						{
-							loader: 'eslint-loader',
-							options: {
-								quiet: true,
-								formatter: require( 'eslint' ).CLIEngine.getFormatter( 'stylish' ),
-							},
-						},
-					],
-				},
-			],
+			rules,
 		},
 		plugins: [
 			new WebpackBar( {
@@ -222,6 +216,7 @@ const testBundle = () => {
 				color: '#34a853',
 			} ),
 		],
+		externals,
 		resolve,
 	};
 };
