@@ -77,17 +77,10 @@ const dataAPI = {
 	maxRequests: 10,
 
 	init() {
-		if ( global.googlesitekit.initialized ) {
-			return;
-		}
-		global.googlesitekit.initialized = true;
-		this.collectModuleData = this.collectModuleData.bind( this );
-		global.googlesitekit.cache = [];
-
 		addAction(
 			'googlesitekit.moduleLoaded',
 			'googlesitekit.collectModuleListingData',
-			this.collectModuleData
+			this.collectModuleData.bind( this )
 		);
 	},
 
@@ -241,7 +234,7 @@ const dataAPI = {
 		console.warn( 'WP Error in data response', error );
 		const { data } = error;
 
-		if ( ! data.reason ) {
+		if ( ! data || ! data.reason ) {
 			return;
 		}
 
